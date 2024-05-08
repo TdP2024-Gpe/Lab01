@@ -13,6 +13,7 @@ Tutte le domande sono elencate nel file "domande.txt". Ogni domanda è memorizza
 Tra una domanda e la successiva è presente una riga vuota.
 
 ***Esempio file "domande.txt"***
+
 ```
 Capitale dell'Italia?
 0
