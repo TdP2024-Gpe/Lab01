@@ -40,6 +40,14 @@ class ElencoDomande:
     def append(self, domanda):
         self._domande.append(domanda)
 
+    def max_level(self):
+
+        y = 0
+        for x in self._domande:
+            if int(x[1]) > y:
+                y = int(x[1])
+        return y
+
     def __str__(self):
         return f"{self._domande}"
 
@@ -72,8 +80,8 @@ class ListaPunti:
     def update(self, name):
         self._punti.update(name)
 
-    def __str__(self):
-        return f"{self._punti}"
+    # def __str__(self):
+    #     return f"{self._punti}"
 
 
 """ 

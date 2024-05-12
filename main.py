@@ -1,7 +1,5 @@
-from multiprocessing import Value
 import random
 from domanda import ElencoDomande as e
-
 from domanda import ListaPunti as l
 
 """ 
@@ -19,9 +17,15 @@ print(d1)
 level = 0
 db_domande = e()
 db_punti = l()
+max_level = 0
 
 
 def read_domande():
+    """
+    Leggo il file domande.txt ed estraggo le singole domande nella lista
+    domanda = []. Quando trovo il rigo vuoto inserisco la domanda nella lista
+    db_domande [[domanda1], [domanda2],....].
+    """
     _f = open("domande.txt", "r", encoding="UTF-8")
     # print(f.readline())
 
@@ -34,48 +38,69 @@ def read_domande():
         else:
             db_domande.append(domanda)
             domanda = []
-
     # print(db_domande.tabella())
     _f.close()
 
 
 def read_punti():
+    """Leggo il file punti.txt e creo un dizionario (nome: punti)"""
     _f = open("punti.txt", "r")
-
-    _gamer = {}
 
     for x in _f:
         x = x.strip()
-        (key, val) = x.split()
-        _gamer.update({key: val})
-        # print(_gamer)
+        (key, val) = x.split()  # Inserisco riga per riga i player al dizionario
+        db_punti._punti.update({key: int(val)})
+        # print(db_punti._punti)
 
-    db_punti.update(_gamer)
+    # print(db_punti._punti)
 
-    print(db_punti)
-
-    # print(_f.read())
     _f.close()
 
 
+def sortpunti(db_punti_punti):
+    return {
+        k: v
+        for k, v in sorted(
+            db_punti_punti.items(), key=lambda item: item[1], reverse=True
+        )
+    }
+
+
+def writefile(db_punti):
+    _w = ""  # Stringa da scrivere nel file punti.txt
+    _f = open("punti.txt", "w")
+    for x in db_punti:
+        if _w == "":
+            _w = f"{x} {db_punti[x]}\n"
+            # print(_w)
+        else:
+            _w = _w + f"{x} {db_punti[x]}\n"
+            # print(_w)
+        # print(_w)
+    _f.write(f"{_w}")
+    _f.close()
+    print(f"\nLa classifica attuale è:\n{_w}")
+
+
 def save_punti(level):
+    """Salvo il punteggio totalizzato nel file punti.txt"""
     print(f"Hai totalizzato {level} punti!")
     _n = input("Inserisci il tuo nickname: ")
-    _w = ""
     # print(db_punti._punti)
-    if _n in db_punti._punti:
+    if _n in db_punti._punti:  # controllo se il nickname è già presente nel db
         # print(db_punti._punti[_n])
-        if level > int(db_punti._punti[_n]):
-            db_punti._punti[_n] = level
-            _f = open("punti.txt", "w")
-            for x in db_punti._punti:
-                _w = _w + f"{x} {db_punti._punti[x]}\n"
-                print(_w)
-            _f.write(f"{_w}")
-            _f.close()
-            #     pass
-            print(_w)
-            print(db_punti._punti)
+        if level > int(db_punti._punti[_n]):  # Aggiorno il punteggio solo se è maggiore
+            db_punti._punti[_n] = int(level)
+            db_punti._punti = sortpunti(db_punti._punti)
+            writefile(db_punti._punti)
+        else:
+            writefile(db_punti._punti)
+    else:
+        db_punti._punti[_n] = int(level)
+        db_punti._punti = sortpunti(db_punti._punti)
+        # print(db_punti._punti)
+        writefile(db_punti._punti)
+        # print(db_punti._punti)
 
 
 def ask_a_question(level):
@@ -106,14 +131,20 @@ def ask_a_question(level):
     _r.append(_r4)
     print(f"  4. {_r4}")
 
-    x = int(input("Inserisci la risposta: "))
+    try:
+        x = int(input("Inserisci la risposta: "))
+    except ValueError:
+        x = int(input("Riprova!, valore non accettato. Inserisci la risposta: "))
 
-    if _r[x - 1] == _d[2]:
+    if _r[x - 1] == _d[2] and level < db_domande.max_level():
         level = level + 1
-        print("Risposta corretta!")
+        print("Risposta corretta!\n")
         ask_a_question(level)
+    elif _r[x - 1] == _d[2] and level >= db_domande.max_level():
+        print("Risposta Corretta! Hai raggiunto il massimo livello.\n")
+        save_punti(level)
     else:
-        print("Risposta sbagliata! La risposta corretta era: ", _r.index(_d[2]) + 1)
+        print(f"Risposta sbagliata! La risposta corretta era: {_r.index(_d[2]) + 1}\n")
         save_punti(level)
 
 
