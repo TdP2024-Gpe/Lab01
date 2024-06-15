@@ -1,5 +1,5 @@
 Paolo 4
-Giuseppe 2
+Giuseppe 4
 Filo 2
 Lucia 1
 Mario 1
